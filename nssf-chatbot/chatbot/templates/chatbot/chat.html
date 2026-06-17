@@ -1,0 +1,233 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NSSF Uganda Chat Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --nssf-green: #006b3f;
+            --nssf-yellow: #f2c94c;
+            --chat-bg: #f4f7f6;
+        }
+
+        body {
+            background: var(--chat-bg);
+            min-height: 100vh;
+        }
+
+        .chat-shell {
+            max-width: 980px;
+            min-height: 100vh;
+        }
+
+        .chat-panel {
+            height: min(72vh, 720px);
+            min-height: 430px;
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: var(--nssf-green);
+            color: #ffffff;
+        }
+
+        .chat-history {
+            overflow-y: auto;
+            background:
+                linear-gradient(rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.94)),
+                repeating-linear-gradient(135deg, #e8f1ed 0, #e8f1ed 1px, transparent 1px, transparent 18px);
+        }
+
+        .message-row {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+
+        .message-row.user {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: min(76%, 680px);
+            padding: 0.75rem 0.95rem;
+            border-radius: 8px;
+            line-height: 1.45;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .message-row.user .message-bubble {
+            background: var(--nssf-green);
+            color: #ffffff;
+        }
+
+        .message-row.assistant .message-bubble {
+            background: #eef4f1;
+            color: #1c2b26;
+        }
+
+        .typing-indicator {
+            display: none;
+        }
+
+        .typing-indicator.show {
+            display: flex;
+        }
+
+        .send-button {
+            background: var(--nssf-green);
+            border-color: var(--nssf-green);
+        }
+
+        .send-button:hover,
+        .send-button:focus {
+            background: #005332;
+            border-color: #005332;
+        }
+
+        .accent-line {
+            width: 72px;
+            height: 4px;
+            background: var(--nssf-yellow);
+            border-radius: 999px;
+        }
+
+        @media (max-width: 576px) {
+            .chat-panel {
+                height: 76vh;
+                min-height: 420px;
+            }
+
+            .message-bubble {
+                max-width: 88%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container chat-shell d-flex flex-column py-4">
+        <section class="mb-3">
+            <p class="text-uppercase text-secondary fw-semibold small mb-1">NSSF Uganda</p>
+            <h1 class="h3 fw-bold mb-2">Website Support Assistant</h1>
+            <div class="accent-line" aria-hidden="true"></div>
+        </section>
+
+        <section class="chat-panel d-flex flex-column shadow-sm">
+            <div class="chat-header px-3 px-md-4 py-3">
+                <div class="fw-semibold">Ask about membership, contributions, benefits, claims, savings, and registration.</div>
+            </div>
+
+            <div id="chatHistory" class="chat-history flex-grow-1 p-3 p-md-4" aria-live="polite">
+                <div class="message-row assistant">
+                    <div class="message-bubble">
+                        Hello. I can help with publicly available information from the NSSF Uganda website. What would you like to know?
+                    </div>
+                </div>
+            </div>
+
+            <div id="typingIndicator" class="typing-indicator assistant message-row px-3 px-md-4 mb-2">
+                <div class="message-bubble">
+                    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                    Preparing a response...
+                </div>
+            </div>
+
+            <form id="chatForm" class="border-top bg-white p-3" method="post" action="{% url 'chatbot:chat_api' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <textarea
+                        id="messageInput"
+                        name="message"
+                        class="form-control"
+                        rows="1"
+                        maxlength="1000"
+                        placeholder="Type your question..."
+                        aria-label="Type your question"
+                        required></textarea>
+                    <button id="sendButton" class="btn btn-primary send-button px-4" type="submit">Send</button>
+                </div>
+                <div id="formHelp" class="form-text">Responses are generated from indexed public NSSF website content.</div>
+            </form>
+        </section>
+    </main>
+
+    <script>
+        const chatForm = document.getElementById("chatForm");
+        const chatHistory = document.getElementById("chatHistory");
+        const messageInput = document.getElementById("messageInput");
+        const sendButton = document.getElementById("sendButton");
+        const typingIndicator = document.getElementById("typingIndicator");
+
+        function appendMessage(role, content) {
+            const row = document.createElement("div");
+            row.className = `message-row ${role}`;
+
+            const bubble = document.createElement("div");
+            bubble.className = "message-bubble";
+            bubble.textContent = content;
+
+            row.appendChild(bubble);
+            chatHistory.appendChild(row);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+
+        function setLoading(isLoading) {
+            sendButton.disabled = isLoading;
+            messageInput.disabled = isLoading;
+            typingIndicator.classList.toggle("show", isLoading);
+        }
+
+        chatForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const message = messageInput.value.trim();
+            if (!message) {
+                return;
+            }
+
+            appendMessage("user", message);
+            messageInput.value = "";
+            setLoading(true);
+
+            const formData = new FormData(chatForm);
+            formData.set("message", message);
+
+            try {
+                const response = await fetch(chatForm.action, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    appendMessage("assistant", data.error || "Sorry, I could not process that request.");
+                    return;
+                }
+
+                appendMessage("assistant", data.response);
+            } catch (error) {
+                appendMessage("assistant", "Network error. Please check your connection and try again.");
+            } finally {
+                setLoading(false);
+                messageInput.focus();
+            }
+        });
+
+        messageInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                chatForm.requestSubmit();
+            }
+        });
+    </script>
+</body>
+</html>

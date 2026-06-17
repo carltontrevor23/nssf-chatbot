@@ -1,0 +1,65 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Env files
+.env
+.env.*
+.env.local
+.venv/
+venv/
+env/
+
+# Django
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+/media
+/staticfiles
+
+# Pytest
+.pytest_cache/
+
+# VSCode
+.vscode/
+
+# IDEs
+.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# Distribution
+build/
+dist/
+*.egg-info/
+
+# Coverage
+.coverage
+.coverage.*
+
+# Mypy
+.mypy_cache/
+
+# Byte-compiled
+*.pyc
+
+# Other
+*.env
+*.key
+*.pem
+
+# Node
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Secrets and keys
+secrets/
+

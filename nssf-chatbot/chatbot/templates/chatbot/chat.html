@@ -1,11 +1,10 @@
-{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>NSSF Uganda Chat Assistant</title>
-    <link rel="stylesheet" href="{% static 'chatbot/css/chat.css' %}">
+    <link rel="stylesheet" href="/static/chatbot/css/chat.css">
 </head>
 <body>
     <main class="chat-shell">
@@ -54,8 +53,7 @@
                 </div>
             </div>
 
-            <form id="chatForm" class="chat-footer" method="post" action="{% url 'chatbot:chat_api' %}">
-                {% csrf_token %}
+            <form id="chatForm" class="chat-footer" method="post" action="/chat">
                 <label for="messageInput" class="visually-hidden">Type your question</label>
                 <div class="input-group">
                     <textarea
@@ -66,25 +64,16 @@
                         placeholder="Ask about NSSF membership, contributions, benefits, claims, or registration."
                         aria-label="Type your question"
                         required></textarea>
-                    <button
-                        id="voiceButton"
-                        class="voice-button"
-                        type="button"
-                        aria-label="Start voice input"
-                        aria-pressed="false">
-                        <span class="btn-icon" aria-hidden="true">&#127908;</span>
-                    </button>
                     <button id="sendButton" class="send-button" type="submit" aria-label="Send message">
                         <span class="btn-icon" aria-hidden="true">&rarr;</span>
                         <span>Send</span>
                     </button>
                 </div>
-                <p id="voiceStatus" class="voice-status" aria-live="polite"></p>
                 <p class="form-note">Responses are generated from indexed public NSSF website content.</p>
             </form>
         </section>
     </main>
 
-    <script src="{% static 'chatbot/js/chat.js' %}"></script>
+    <script src="/static/chatbot/js/chat.js"></script>
 </body>
 </html>

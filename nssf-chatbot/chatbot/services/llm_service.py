@@ -1,7 +1,7 @@
 """LLM integration layer for generating chatbot responses."""
 from __future__ import annotations
 
-from django.conf import settings
+from config import GROQ_API_KEY, GROQ_CHAT_MODEL
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_groq import ChatGroq
 
@@ -14,12 +14,12 @@ class GroqLlmService:
     """Small wrapper around Groq chat models."""
 
     def __init__(self):
-        if not settings.GROQ_API_KEY:
+        if not GROQ_API_KEY:
             raise LlmServiceError("GROQ_API_KEY is not configured.")
 
         self.chat_model = ChatGroq(
-            model=settings.GROQ_CHAT_MODEL,
-            api_key=settings.GROQ_API_KEY,
+            model=GROQ_CHAT_MODEL,
+            api_key=GROQ_API_KEY,
             temperature=0.2,
         )
 

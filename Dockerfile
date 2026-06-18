@@ -19,8 +19,5 @@ COPY nssf-chatbot/ .
 # Expose port 7860 (required for HF Spaces)
 EXPOSE 7860
 
-# Set Django settings
-ENV DJANGO_SETTINGS_MODULE=nssf_chatbot.settings
-
-# Run migrations and start server
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:7860"]
+# Run the FastAPI application
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port 7860"]

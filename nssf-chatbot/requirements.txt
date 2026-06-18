@@ -10,3 +10,5 @@ langchain-text-splitters>=0.2.4
 faiss-cpu>=1.8.0.post1
 sentence-transformers>=3.0.0
 tiktoken>=0.7.0
+gunicorn>=21.0.0
+whitenoise>=6.5.0

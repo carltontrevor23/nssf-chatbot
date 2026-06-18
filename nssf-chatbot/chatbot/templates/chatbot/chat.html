@@ -66,11 +66,20 @@
                         placeholder="Ask about NSSF membership, contributions, benefits, claims, or registration."
                         aria-label="Type your question"
                         required></textarea>
+                    <button
+                        id="voiceButton"
+                        class="voice-button"
+                        type="button"
+                        aria-label="Start voice input"
+                        aria-pressed="false">
+                        <span class="btn-icon" aria-hidden="true">&#127908;</span>
+                    </button>
                     <button id="sendButton" class="send-button" type="submit" aria-label="Send message">
                         <span class="btn-icon" aria-hidden="true">&rarr;</span>
                         <span>Send</span>
                     </button>
                 </div>
+                <p id="voiceStatus" class="voice-status" aria-live="polite"></p>
                 <p class="form-note">Responses are generated from indexed public NSSF website content.</p>
             </form>
         </section>

@@ -1,19 +1,21 @@
 document.addEventListener("DOMContentLoaded", () => {
     const chatForm = document.getElementById("chatForm");
-<<<<<<< HEAD
     const chatBody = document.getElementById("chatBody");
-=======
->>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
     const chatHistory = document.getElementById("chatHistory");
     const messageInput = document.getElementById("messageInput");
     const sendButton = document.getElementById("sendButton");
+    const voiceButton = document.getElementById("voiceButton");
+    const voiceStatus = document.getElementById("voiceStatus");
     const typingIndicator = document.getElementById("typingIndicator");
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isListening = false;
+    let voiceBaseText = "";
 
     function getCurrentTime() {
         return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
-<<<<<<< HEAD
     function scrollToLatest() {
         requestAnimationFrame(() => {
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -25,8 +27,100 @@ document.addEventListener("DOMContentLoaded", () => {
         messageInput.style.height = `${messageInput.scrollHeight}px`;
     }
 
-=======
->>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
+    function setVoiceStatus(message = "", type = "") {
+        voiceStatus.textContent = message;
+        voiceStatus.classList.toggle("is-error", type === "error");
+        voiceStatus.classList.toggle("is-listening", type === "listening");
+    }
+
+    function setVoiceListening(nextIsListening) {
+        isListening = nextIsListening;
+        voiceButton.classList.toggle("is-listening", isListening);
+        voiceButton.setAttribute("aria-pressed", String(isListening));
+        voiceButton.setAttribute(
+            "aria-label",
+            isListening ? "Stop voice input" : "Start voice input",
+        );
+    }
+
+    function updateInputFromVoice(transcript) {
+        const separator = voiceBaseText && transcript ? " " : "";
+        messageInput.value = `${voiceBaseText}${separator}${transcript}`.trimStart();
+        resizeMessageInput();
+        messageInput.focus();
+    }
+
+    function stopListening() {
+        if (recognition && isListening) {
+            recognition.stop();
+        }
+    }
+
+    // Browser Speech Recognition turns microphone audio into text locally in the UI flow.
+    // The transcript is inserted into the existing textarea, so backend submission is unchanged.
+    function setupSpeechRecognition() {
+        if (!SpeechRecognition) {
+            voiceButton.disabled = true;
+            setVoiceStatus("Voice input is not supported in this browser.", "error");
+            return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = "en-US";
+        recognition.interimResults = true;
+        recognition.continuous = false;
+
+        recognition.addEventListener("start", () => {
+            setVoiceListening(true);
+            setVoiceStatus("Listening...", "listening");
+        });
+
+        recognition.addEventListener("result", (event) => {
+            let transcript = "";
+            for (let index = event.resultIndex; index < event.results.length; index += 1) {
+                transcript += event.results[index][0].transcript;
+            }
+            updateInputFromVoice(transcript.trim());
+        });
+
+        recognition.addEventListener("error", (event) => {
+            const permissionErrors = ["not-allowed", "service-not-allowed"];
+            const message = permissionErrors.includes(event.error)
+                ? "Microphone permission was denied. Allow microphone access and try again."
+                : "Voice input could not start. Please try again or type your message.";
+            setVoiceStatus(message, "error");
+            setVoiceListening(false);
+        });
+
+        recognition.addEventListener("end", () => {
+            setVoiceListening(false);
+            if (!voiceStatus.classList.contains("is-error")) {
+                setVoiceStatus(messageInput.value.trim() ? "Voice text added. You can edit or send it." : "");
+            }
+        });
+    }
+
+    function toggleVoiceInput() {
+        if (!recognition) {
+            setVoiceStatus("Voice input is not supported in this browser.", "error");
+            return;
+        }
+
+        if (isListening) {
+            stopListening();
+            return;
+        }
+
+        voiceBaseText = messageInput.value.trim();
+        setVoiceStatus("");
+
+        try {
+            recognition.start();
+        } catch (error) {
+            setVoiceStatus("Voice input is already starting. Please try again in a moment.", "error");
+        }
+    }
+
     function appendMessage(role, content, includeTime = true) {
         const row = document.createElement("div");
         row.className = `message-row ${role}`;
@@ -59,23 +153,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         row.appendChild(bubble);
         chatHistory.appendChild(row);
-<<<<<<< HEAD
         scrollToLatest();
-=======
-        chatHistory.scrollTop = chatHistory.scrollHeight;
->>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
     }
 
     function setLoading(isLoading) {
         sendButton.disabled = isLoading;
         messageInput.disabled = isLoading;
+        voiceButton.disabled = isLoading || !recognition;
         typingIndicator.classList.toggle("show", isLoading);
         if (isLoading) {
-<<<<<<< HEAD
             scrollToLatest();
-=======
-            chatHistory.scrollTop = chatHistory.scrollHeight;
->>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
         }
     }
 
@@ -101,12 +188,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        stopListening();
         appendMessage("user", message);
         messageInput.value = "";
-<<<<<<< HEAD
         resizeMessageInput();
-=======
->>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
         setLoading(true);
 
         try {
@@ -132,10 +217,9 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-<<<<<<< HEAD
     messageInput.addEventListener("input", resizeMessageInput);
+    voiceButton.addEventListener("click", toggleVoiceInput);
+    setupSpeechRecognition();
     resizeMessageInput();
-=======
->>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
     messageInput.focus();
 });

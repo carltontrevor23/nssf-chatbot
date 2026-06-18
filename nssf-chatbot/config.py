@@ -1,9 +1,13 @@
-from __future__ import annotations
+"""Shared runtime configuration for the chatbot services.
 
-import os
+This module is intentionally framework-neutral so both Django and FastAPI
+entry points can import the RAG services without depending on Django settings.
+"""
 from pathlib import Path
+import os
 
 from dotenv import load_dotenv
+
 
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
@@ -14,9 +18,6 @@ LOCAL_EMBEDDING_MODEL = os.getenv(
     "LOCAL_EMBEDDING_MODEL",
     "sentence-transformers/all-MiniLM-L6-v2",
 )
-VECTOR_DB_PATH = Path(os.getenv("VECTOR_DB_PATH", "vector_db/faiss_index"))
-if not VECTOR_DB_PATH.is_absolute():
-    VECTOR_DB_PATH = BASE_DIR / VECTOR_DB_PATH
-
+VECTOR_DB_PATH = BASE_DIR / os.getenv("VECTOR_DB_PATH", "vector_db/faiss_index")
 NSSF_BASE_URL = os.getenv("NSSF_BASE_URL", "https://www.nssfug.org/")
 RAG_TOP_K = int(os.getenv("RAG_TOP_K", "4"))

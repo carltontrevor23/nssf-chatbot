@@ -39,11 +39,15 @@ def _get_chat_history(session_id: str) -> list[dict[str, str]]:
     return app.state.chat_sessions.setdefault(session_id, [])
 
 
-@app.get("/", response_class=HTMLResponse)
-async def chat_page(request: Request, session_id: str | None = Cookie(default=None)) -> HTMLResponse:
+@app.get("/")
+async def chat_page(request: Request, session_id: str | None = Cookie(default=None)):
     session_id = _get_session_id(session_id)
     _get_chat_history(session_id)
-    response = templates.TemplateResponse("chat.html", {"request": request})
+    response = templates.TemplateResponse(
+        request,
+        "chat_fastapi.html",
+        {"request": request},
+    )
     if not request.cookies.get("session_id"):
         response.set_cookie("session_id", session_id, httponly=True, samesite="lax")
     return response

@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     const chatForm = document.getElementById("chatForm");
+<<<<<<< HEAD
     const chatBody = document.getElementById("chatBody");
+=======
+>>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
     const chatHistory = document.getElementById("chatHistory");
     const messageInput = document.getElementById("messageInput");
     const sendButton = document.getElementById("sendButton");
@@ -10,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
+<<<<<<< HEAD
     function scrollToLatest() {
         requestAnimationFrame(() => {
             chatBody.scrollTop = chatBody.scrollHeight;
@@ -21,6 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageInput.style.height = `${messageInput.scrollHeight}px`;
     }
 
+=======
+>>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
     function appendMessage(role, content, includeTime = true) {
         const row = document.createElement("div");
         row.className = `message-row ${role}`;
@@ -53,7 +59,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         row.appendChild(bubble);
         chatHistory.appendChild(row);
+<<<<<<< HEAD
         scrollToLatest();
+=======
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+>>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
     }
 
     function setLoading(isLoading) {
@@ -61,7 +71,11 @@ document.addEventListener("DOMContentLoaded", () => {
         messageInput.disabled = isLoading;
         typingIndicator.classList.toggle("show", isLoading);
         if (isLoading) {
+<<<<<<< HEAD
             scrollToLatest();
+=======
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+>>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
         }
     }
 
@@ -89,7 +103,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         appendMessage("user", message);
         messageInput.value = "";
+<<<<<<< HEAD
         resizeMessageInput();
+=======
+>>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
         setLoading(true);
 
         try {
@@ -115,7 +132,10 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+<<<<<<< HEAD
     messageInput.addEventListener("input", resizeMessageInput);
     resizeMessageInput();
+=======
+>>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
     messageInput.focus();
 });

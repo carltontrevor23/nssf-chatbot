@@ -19,7 +19,11 @@ DEBUG = os.getenv("DEBUG", "False").lower() in {"1", "true", "yes", "on"}
 
 ALLOWED_HOSTS = [
     host.strip()
+<<<<<<< HEAD
     for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,*.hf.space").split(",")
+=======
+    for host in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+>>>>>>> 15e36d714ab8300860e6546afd50e9455203cea4
     if host.strip()
 ]
 

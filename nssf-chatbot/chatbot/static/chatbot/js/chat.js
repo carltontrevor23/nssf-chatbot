@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const chatForm = document.getElementById("chatForm");
+    const chatBody = document.getElementById("chatBody");
     const chatHistory = document.getElementById("chatHistory");
     const messageInput = document.getElementById("messageInput");
     const sendButton = document.getElementById("sendButton");
@@ -7,6 +8,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getCurrentTime() {
         return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function scrollToLatest() {
+        requestAnimationFrame(() => {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        });
+    }
+
+    function resizeMessageInput() {
+        messageInput.style.height = "auto";
+        messageInput.style.height = `${messageInput.scrollHeight}px`;
     }
 
     function appendMessage(role, content, includeTime = true) {
@@ -41,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         row.appendChild(bubble);
         chatHistory.appendChild(row);
-        chatHistory.scrollTop = chatHistory.scrollHeight;
+        scrollToLatest();
     }
 
     function setLoading(isLoading) {
@@ -49,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageInput.disabled = isLoading;
         typingIndicator.classList.toggle("show", isLoading);
         if (isLoading) {
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            scrollToLatest();
         }
     }
 
@@ -77,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         appendMessage("user", message);
         messageInput.value = "";
+        resizeMessageInput();
         setLoading(true);
 
         try {
@@ -102,5 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    messageInput.addEventListener("input", resizeMessageInput);
+    resizeMessageInput();
     messageInput.focus();
 });

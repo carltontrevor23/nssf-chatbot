@@ -33,22 +33,24 @@
                 <p>Type your question below and receive answers built from indexed public NSSF website content.</p>
             </div>
 
-            <div id="chatHistory" class="chat-history" aria-live="polite" aria-label="Chat conversation">
-                <div class="message-row assistant">
-                    <div class="message-bubble">
-                        <div class="message-text">Hello. I can help with publicly available information from the NSSF Uganda website. What would you like to know?</div>
-                        <div class="message-meta">
-                            <span class="message-role">NSSF Assistant</span>
-                            <span class="message-time">Now</span>
+            <div id="chatBody" class="chat-body">
+                <div id="chatHistory" class="chat-history" aria-live="polite" aria-label="Chat conversation">
+                    <div class="message-row assistant">
+                        <div class="message-bubble">
+                            <div class="message-text">Hello. I can help with publicly available information from the NSSF Uganda website. What would you like to know?</div>
+                            <div class="message-meta">
+                                <span class="message-role">NSSF Assistant</span>
+                                <span class="message-time">Now</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="typingIndicator" class="typing-indicator" aria-hidden="true">
-                <div class="typing-bubble" role="status" aria-live="polite">
-                    <span class="typing-dot" aria-hidden="true"></span>
-                    <span>Preparing a response…</span>
+                <div id="typingIndicator" class="typing-indicator" aria-hidden="true">
+                    <div class="typing-bubble" role="status" aria-live="polite">
+                        <span class="typing-dot" aria-hidden="true"></span>
+                        <span>Preparing a response...</span>
+                    </div>
                 </div>
             </div>
 
@@ -64,7 +66,10 @@
                         placeholder="Ask about NSSF membership, contributions, benefits, claims, or registration."
                         aria-label="Type your question"
                         required></textarea>
-                    <button id="sendButton" class="send-button" type="submit" aria-label="Send message">Send</button>
+                    <button id="sendButton" class="send-button" type="submit" aria-label="Send message">
+                        <span class="btn-icon" aria-hidden="true">&rarr;</span>
+                        <span>Send</span>
+                    </button>
                 </div>
                 <p class="form-note">Responses are generated from indexed public NSSF website content.</p>
             </form>

@@ -5,12 +5,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageInput = document.getElementById("messageInput");
     const sendButton = document.getElementById("sendButton");
     const voiceButton = document.getElementById("voiceButton");
+    const voiceFeedbackButton = document.getElementById("voiceFeedbackButton");
     const voiceStatus = document.getElementById("voiceStatus");
     const typingIndicator = document.getElementById("typingIndicator");
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const canSpeak = "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
     let recognition = null;
     let isListening = false;
     let voiceBaseText = "";
+    let voiceFeedbackEnabled = canSpeak;
 
     function getCurrentTime() {
         return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -31,6 +34,21 @@ document.addEventListener("DOMContentLoaded", () => {
         voiceStatus.textContent = message;
         voiceStatus.classList.toggle("is-error", type === "error");
         voiceStatus.classList.toggle("is-listening", type === "listening");
+    }
+
+    function setVoiceFeedbackEnabled(nextIsEnabled) {
+        voiceFeedbackEnabled = canSpeak && nextIsEnabled;
+        voiceFeedbackButton.classList.toggle("is-muted", !voiceFeedbackEnabled);
+        voiceFeedbackButton.setAttribute("aria-pressed", String(voiceFeedbackEnabled));
+        voiceFeedbackButton.setAttribute(
+            "aria-label",
+            voiceFeedbackEnabled ? "Turn voice feedback off" : "Turn voice feedback on",
+        );
+        voiceFeedbackButton.querySelector(".btn-icon").textContent = voiceFeedbackEnabled ? "\uD83D\uDD0A" : "\uD83D\uDD07";
+
+        if (!voiceFeedbackEnabled && canSpeak) {
+            window.speechSynthesis.cancel();
+        }
     }
 
     function setVoiceListening(nextIsListening) {
@@ -54,6 +72,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if (recognition && isListening) {
             recognition.stop();
         }
+    }
+
+    function speakAssistantResponse(text) {
+        if (!voiceFeedbackEnabled || !canSpeak || !text) {
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        window.speechSynthesis.speak(utterance);
     }
 
     // Browser Speech Recognition turns microphone audio into text locally in the UI flow.
@@ -121,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function appendMessage(role, content, includeTime = true) {
+    function appendMessage(role, content, includeTime = true, shouldSpeak = false) {
         const row = document.createElement("div");
         row.className = `message-row ${role}`;
 
@@ -154,6 +186,10 @@ document.addEventListener("DOMContentLoaded", () => {
         row.appendChild(bubble);
         chatHistory.appendChild(row);
         scrollToLatest();
+
+        if (shouldSpeak && role === "assistant") {
+            speakAssistantResponse(content);
+        }
     }
 
     function setLoading(isLoading) {
@@ -198,12 +234,12 @@ document.addEventListener("DOMContentLoaded", () => {
             const { status, data } = await sendMessage(message);
 
             if (!status) {
-                appendMessage("assistant", data.error || "Sorry, I could not process that request.");
+                appendMessage("assistant", data.error || "Sorry, I could not process that request.", true, true);
             } else {
-                appendMessage("assistant", data.response);
+                appendMessage("assistant", data.response, true, true);
             }
         } catch (error) {
-            appendMessage("assistant", "Network error. Please check your connection and try again.");
+            appendMessage("assistant", "Network error. Please check your connection and try again.", true, true);
         } finally {
             setLoading(false);
             messageInput.focus();
@@ -219,6 +255,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     messageInput.addEventListener("input", resizeMessageInput);
     voiceButton.addEventListener("click", toggleVoiceInput);
+    voiceFeedbackButton.addEventListener("click", () => {
+        setVoiceFeedbackEnabled(!voiceFeedbackEnabled);
+    });
+
+    if (!canSpeak) {
+        voiceFeedbackButton.disabled = true;
+        voiceFeedbackButton.setAttribute("aria-label", "Voice feedback is not supported in this browser");
+    }
+
+    setVoiceFeedbackEnabled(canSpeak);
     setupSpeechRecognition();
     resizeMessageInput();
     messageInput.focus();

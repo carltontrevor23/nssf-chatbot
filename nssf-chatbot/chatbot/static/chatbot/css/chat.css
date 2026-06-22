@@ -157,6 +157,18 @@ body {
     border-bottom: 1px solid var(--nssf-border);
 }
 
+.chat-panel__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.chat-panel__title > div {
+    min-width: 0;
+}
+
 .chat-panel__header h2 {
     margin: 0;
     font-size: 1.1rem;
@@ -390,14 +402,38 @@ body {
     transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
 
+.voice-feedback-button {
+    flex: 0 0 44px;
+    width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    background: rgba(255, 255, 255, 0.14);
+    color: var(--nssf-white);
+    font: inherit;
+    cursor: pointer;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
 .voice-button:hover {
     border-color: var(--nssf-gold);
     transform: translateY(-1px);
     box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
 }
 
+.voice-feedback-button:hover {
+    border-color: var(--nssf-gold);
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-1px);
+}
+
 .voice-button:focus,
-.voice-button:focus-visible {
+.voice-button:focus-visible,
+.voice-feedback-button:focus,
+.voice-feedback-button:focus-visible {
     border-color: var(--nssf-gold);
     box-shadow: 0 0 0 4px var(--nssf-focus-ring);
     outline: none;
@@ -412,6 +448,17 @@ body {
 
 .voice-button:disabled {
     opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.voice-feedback-button.is-muted,
+.voice-feedback-button:disabled {
+    opacity: 0.65;
+}
+
+.voice-feedback-button:disabled {
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
@@ -559,6 +606,10 @@ body {
     .chat-history,
     .chat-footer {
         padding: var(--space-2);
+    }
+
+    .chat-panel__title {
+        align-items: flex-start;
     }
 
     .typing-indicator {

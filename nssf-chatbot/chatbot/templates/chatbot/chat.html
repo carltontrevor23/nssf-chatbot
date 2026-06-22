@@ -29,8 +29,20 @@
 
         <section class="chat-panel" role="application" aria-label="NSSF Uganda chatbot window">
             <div class="chat-panel__header">
-                <h2>NSSF Uganda Virtual Assistant</h2>
-                <p>Type your question below and receive answers built from indexed public NSSF website content.</p>
+                <div class="chat-panel__title">
+                    <div>
+                        <h2>NSSF Uganda Virtual Assistant</h2>
+                        <p>Type or speak your question below and receive answers built from indexed public NSSF website content.</p>
+                    </div>
+                    <button
+                        id="voiceFeedbackButton"
+                        class="voice-feedback-button"
+                        type="button"
+                        aria-label="Turn voice feedback off"
+                        aria-pressed="true">
+                        <span class="btn-icon" aria-hidden="true">&#128266;</span>
+                    </button>
+                </div>
             </div>
 
             <div id="chatBody" class="chat-body">

@@ -21,6 +21,7 @@ class GroqLlmService:
             model=GROQ_CHAT_MODEL,
             api_key=GROQ_API_KEY,
             temperature=0.2,
+            request_timeout=30,
         )
 
     def generate_answer(

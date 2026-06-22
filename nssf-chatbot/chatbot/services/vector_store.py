@@ -24,6 +24,7 @@ class NssfVectorStore:
         self.embeddings = HuggingFaceEmbeddings(
             model_name=LOCAL_EMBEDDING_MODEL,
         )
+        self._vector_store: FAISS | None = None
 
     def build_from_pages(self, pages: list[ScrapedPage]) -> int:
         """Create a FAISS index from scraped pages and return chunk count."""
@@ -52,16 +53,20 @@ class NssfVectorStore:
 
     def load(self) -> FAISS:
         """Load the FAISS index from disk."""
+        if self._vector_store is not None:
+            return self._vector_store
+
         if not self.index_path.exists():
             raise VectorStoreError(
                 "The vector database was not found. Run `python ingest_data.py` first."
             )
 
-        return FAISS.load_local(
+        self._vector_store = FAISS.load_local(
             str(self.index_path),
             self.embeddings,
             allow_dangerous_deserialization=True,
         )
+        return self._vector_store
 
     def retrieve(self, question: str, top_k: int | None = None) -> list[Document]:
         """Return the most relevant NSSF content chunks for a question."""

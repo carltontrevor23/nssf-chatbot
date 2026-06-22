@@ -3,14 +3,17 @@ from __future__ import annotations
 import json
 import logging
 import uuid
+from functools import lru_cache
 from pathlib import Path
 
 from dotenv import load_dotenv
 from fastapi import Cookie, FastAPI, Form, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.concurrency import run_in_threadpool
 
+from config import VECTOR_DB_PATH
 from chatbot.services.rag_service import RagService, RagServiceError
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -39,6 +42,11 @@ def _get_chat_history(session_id: str) -> list[dict[str, str]]:
     return app.state.chat_sessions.setdefault(session_id, [])
 
 
+@lru_cache(maxsize=1)
+def _get_rag_service() -> RagService:
+    return RagService()
+
+
 @app.get("/")
 async def chat_page(request: Request, session_id: str | None = Cookie(default=None)):
     session_id = _get_session_id(session_id)
@@ -51,6 +59,23 @@ async def chat_page(request: Request, session_id: str | None = Cookie(default=No
     if not request.cookies.get("session_id"):
         response.set_cookie("session_id", session_id, httponly=True, samesite="lax")
     return response
+
+
+@app.get("/health")
+async def health() -> JSONResponse:
+    index_files = [
+        VECTOR_DB_PATH / "index.faiss",
+        VECTOR_DB_PATH / "index.pkl",
+    ]
+    vector_db_ready = all(path.exists() for path in index_files)
+    return JSONResponse(
+        {
+            "status": "ok" if vector_db_ready else "degraded",
+            "vector_db_ready": vector_db_ready,
+            "vector_db_path": str(VECTOR_DB_PATH),
+        },
+        status_code=200 if vector_db_ready else 503,
+    )
 
 
 @app.post("/chat", name="chat_api")
@@ -73,8 +98,12 @@ async def chat_api(
     chat_history = _get_chat_history(session_id)
 
     try:
-        rag_service = RagService()
-        bot_response = rag_service.answer_question(message_text, chat_history)
+        rag_service = _get_rag_service()
+        bot_response = await run_in_threadpool(
+            rag_service.answer_question,
+            message_text,
+            chat_history,
+        )
     except RagServiceError as exc:
         logger.warning("Chatbot service error: %s", exc)
         return JSONResponse({"error": str(exc)}, status_code=503)

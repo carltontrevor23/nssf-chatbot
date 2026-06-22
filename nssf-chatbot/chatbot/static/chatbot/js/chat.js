@@ -212,7 +212,20 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: { "X-Requested-With": "XMLHttpRequest" },
         });
 
-        return response.json().then((data) => ({ status: response.ok, data }));
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+            const data = await response.json();
+            return { status: response.ok, data };
+        }
+
+        const text = await response.text();
+        const fallback = response.ok
+            ? "The server returned an unexpected response."
+            : `Server error ${response.status}. Please check the Render logs.`;
+        return {
+            status: false,
+            data: { error: text.trim() || fallback },
+        };
     }
 
     chatForm.addEventListener("submit", async (event) => {

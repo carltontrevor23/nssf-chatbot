@@ -1,16 +1,22 @@
 :root {
-    --nssf-green-primary: #006633;
-    --nssf-green-dark: #00471F;
-    --nssf-green-light: #E8F3EC;
-    --nssf-gold: #F2A900;
-    --nssf-gold-dark: #D89500;
+    --nssf-blue-primary: #002147;
+    --nssf-gold: #FFD700;
     --nssf-white: #FFFFFF;
+    --nssf-light-gray: #F2F2F2;
+
+    /* Back-compat aliases (keep existing class usage working) */
+    --nssf-green-primary: var(--nssf-blue-primary);
+    --nssf-green-dark: #001630;
+    --nssf-green-light: #E8EEF8;
+    --nssf-gold-dark: #D8B800;
+
     --nssf-text-dark: #1A1A1A;
     --nssf-text-muted: #5F6B66;
     --nssf-border: #D9E2DC;
     --nssf-error: #C0392B;
-    --nssf-surface: #F7FAF8;
-    --nssf-focus-ring: rgba(242, 169, 0, 0.32);
+    --nssf-surface: var(--nssf-light-gray);
+
+    --nssf-focus-ring: rgba(255, 215, 0, 0.32);
     --nssf-shadow: 0 4px 16px rgba(16, 24, 40, 0.08);
     --nssf-radius: 24px;
     --space-1: 0.5rem;
@@ -20,6 +26,7 @@
     --chat-max-width: 1120px;
     --chat-panel-height: min(760px, calc(100vh - 13rem));
 }
+
 
 * {
     box-sizing: border-box;
@@ -153,7 +160,7 @@ body {
 
 .chat-panel__header {
     padding: var(--space-3);
-    background: linear-gradient(135deg, var(--nssf-green-primary), var(--nssf-green-dark));
+    background: linear-gradient(135deg, var(--nssf-blue-primary), var(--nssf-green-dark));
     border-bottom: 1px solid var(--nssf-border);
 }
 
@@ -236,14 +243,53 @@ body {
 }
 
 .message-row.user .message-bubble {
-    background: var(--nssf-green-primary);
+    background: var(--nssf-blue-primary);
     color: var(--nssf-white);
     border: 1px solid var(--nssf-green-dark);
 }
 
+
 .message-text {
     min-width: 0;
 }
+
+.message-text p {
+    margin: 0 0 0.75rem 0;
+}
+
+.message-text p:last-child {
+    margin-bottom: 0;
+}
+
+.message-text br {
+    line-height: 1.4;
+}
+
+.message-text ul,
+.message-text ol {
+    margin: 0 0 0.9rem 1.1rem;
+    padding: 0;
+}
+
+.message-text li {
+    margin: 0.25rem 0;
+}
+
+.message-text h3,
+.message-text h4 {
+    margin: 0.75rem 0 0.5rem;
+    line-height: 1.25;
+}
+
+.message-text blockquote {
+    margin: 0 0 0.9rem;
+    padding: 0.6rem 0.75rem;
+    border-left: 4px solid var(--nssf-gold);
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    color: var(--nssf-text-muted);
+}
+
 
 .message-meta {
     display: flex;
@@ -269,8 +315,9 @@ body {
 
 .message-row.user .message-meta,
 .message-row.user .message-role {
-    color: rgba(255, 255, 255, 0.82);
+    color: rgba(255, 255, 255, 0.92);
 }
+
 
 .typing-indicator {
     display: none;

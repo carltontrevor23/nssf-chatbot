@@ -22,7 +22,7 @@ load_dotenv(BASE_DIR / ".env")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="NSSF Uganda Chatbot")
+app = FastAPI(title="FundBot")
 app.state.chat_sessions = {}
 
 app.mount(

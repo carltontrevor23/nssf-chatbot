@@ -1,4 +1,4 @@
-# NSSF Uganda Chatbot
+# FundBot
 
 A production-ready starter chatbot for the NSSF Uganda website. It uses Django for the web application and a Retrieval-Augmented Generation (RAG) pipeline so answers are grounded in content scraped from public NSSF Uganda pages.
 

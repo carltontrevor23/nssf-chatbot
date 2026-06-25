@@ -16,6 +16,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project
 COPY nssf-chatbot/ .
 
+# Build the local FAISS index inside the image. The vector_db directory is
+# intentionally git-ignored, so deployed containers must create it at build time.
+RUN python ingest_data.py
+
 # Expose port 7860 (required for HF Spaces)
 EXPOSE 7860
 

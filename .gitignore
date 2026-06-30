@@ -63,3 +63,7 @@ logs/
 # Secrets and keys
 secrets/
 
+# Local Vector DB
+vector_db/
+
+

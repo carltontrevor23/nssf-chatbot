@@ -1,7 +1,5 @@
-from pathlib import Path
-import sys
+import uvicorn
+from app import app  # noqa: F401
 
-ROOT = Path(__file__).resolve().parent
-sys.path.insert(0, str(ROOT / "nssf-chatbot"))
-
-from app import app  # noqa: E402,F401
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=7860, reload=True)
